@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalAI - AI Legal Assistant</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Playfair+Display:wght@700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navbar-height: 3.5rem;
+        }
+        body {
+            font-family: 'Merriweather', serif;
+        }
+        .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .font-merriweather {
+            font-family: 'Merriweather', serif;
+        }
+        
+        /* The Master Global Background (Grid + Dots) */
+        .pattern-global {
+          background-image: 
+            linear-gradient(to right, rgba(79, 70, 229, 0.12) 1.5px, transparent 1.5px),
+            linear-gradient(to bottom, rgba(79, 70, 229, 0.12) 1.5px, transparent 1.5px),
+            radial-gradient(rgba(79, 70, 229, 0.22) 1px, transparent 1px);
+          background-size: 60px 60px, 60px 60px, 30px 30px;
+        }
+
+        /* Micro Patterns */
+        .pattern-dots {
+          background-image: radial-gradient(currentColor 1px, transparent 1px);
+          background-size: 10px 10px;
+        }
+
+        .pattern-grid {
+          background-image: linear-gradient(to right, currentColor 0.5px, transparent 0.5px),
+                            linear-gradient(to bottom, currentColor 0.5px, transparent 0.5px);
+          background-size: 14px 14px;
+        }
+
+        .pattern-diagonal {
+          background-image: repeating-linear-gradient(45deg, currentColor, currentColor 0.5px, transparent 0.5px, transparent 8px);
+        }
+
+        .pattern-plus {
+          background-image: radial-gradient(circle, currentColor 0.8px, transparent 0.8px),
+                            linear-gradient(to right, currentColor 0.5px, transparent 0.5px),
+                            linear-gradient(to bottom, currentColor 0.5px, transparent 0.5px);
+          background-size: 20px 20px;
+          background-position: 0 0, 10px 10px, 10px 10px;
+        }
+
+        /* Technical Blueprint Cross Grid */
+        .pattern-cross {
+            background: 
+                linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px) 0 0,
+                linear-gradient(180deg, rgba(255,255,255,0.15) 1px, transparent 1px) 0 0;
+            background-size: 20px 20px;
+        }
+
+        .tech-mono {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px;
+          font-weight: 700;
+          color: rgba(79, 70, 229, 0.9);
+          letter-spacing: -0.02em;
+        }
+
+        /* Animations */
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(20px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes highlightPulse {
+          0% { opacity: 0; transform: scale(0.95); }
+          50% { opacity: 1; transform: scale(1.05); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+
+        .animate-slideInRight { 
+          animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Utility classes */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Premium Markdown Styling */
+        .prose-legal {
+            font-family: 'Merriweather', serif;
+            line-height: 1.9;
+            color: inherit;
+        }
+        .prose-legal h1, .prose-legal h2, .prose-legal h3, .prose-legal h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+        .dark .prose-legal h1, .dark .prose-legal h2, .dark .prose-legal h3, .dark .prose-legal h4 {
+            color: #a5b4fc;
+        }
+        .prose-legal h1 { font-size: 1.85rem; border-bottom: 2px solid rgba(79, 70, 229, 0.1); padding-bottom: 0.75rem; }
+        .prose-legal h2 { font-size: 1.55rem; }
+        .prose-legal h3 { font-size: 1.3rem; }
+        
+        .prose-legal p {
+            margin-bottom: 1.6em;
+            font-size: 0.95rem;
+            color: #334155;
+        }
+        .dark .prose-legal p { color: #cbd5e1; }
+        
+        .prose-legal table {
+            font-size: 0.85rem;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            margin: 2.5rem 0;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 1);
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.05);
+        }
+        .dark .prose-legal table {
+            border-color: rgba(51, 65, 85, 1);
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+        .prose-legal thead {
+            background-color: #f8fafc;
+        }
+        .dark .prose-legal thead {
+            background-color: #1e293b;
+        }
+        .prose-legal th {
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: #475569;
+            text-align: left;
+            padding: 1.5rem 1.25rem;
+            border-bottom: 2px solid rgba(226, 232, 240, 0.8);
+        }
+        .dark .prose-legal th {
+            color: #94a3b8;
+            border-bottom-color: rgba(51, 65, 85, 0.8);
+        }
+        .prose-legal td {
+            padding: 1.25rem;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+            vertical-align: top;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .dark .prose-legal td {
+            border-bottom-color: rgba(51, 65, 85, 0.4);
+            color: #cbd5e1;
+        }
+        .prose-legal tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .prose-legal blockquote {
+            border-left: 6px solid #6366f1;
+            padding: 1.5rem 2rem;
+            font-style: italic;
+            background-color: rgba(99, 102, 241, 0.05);
+            border-radius: 0 1.5rem 1.5rem 0;
+            color: #475569;
+            margin: 2.5rem 0;
+            position: relative;
+        }
+        .prose-legal blockquote::before {
+            content: '“';
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            font-size: 3rem;
+            color: #6366f1;
+            opacity: 0.1;
+            font-family: serif;
+        }
+        .dark .prose-legal blockquote {
+            background-color: rgba(99, 102, 241, 0.08);
+            color: #94a3b8;
+        }
+        
+        .prose-legal ul, .prose-legal ol {
+            margin-bottom: 1.8em;
+            padding-left: 2rem;
+        }
+        .prose-legal ul { list-style-type: none; }
+        .prose-legal ol { list-style-type: decimal; }
+        
+        .prose-legal ul li {
+            position: relative;
+            margin-bottom: 1em;
+            padding-left: 0.5rem;
+        }
+        .prose-legal ul li::before {
+            content: "";
+            position: absolute;
+            left: -1.25rem;
+            top: 0.65rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: #6366f1;
+            border-radius: 1px;
+            transform: rotate(45deg);
+        }
+        
+        .prose-legal li::marker {
+            color: #6366f1;
+            font-weight: 900;
+        }
+        
+        .prose-legal code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #f1f5f9;
+            padding: 0.3rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.85em;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+        .dark .prose-legal code {
+            background-color: #1e293b;
+            color: #a5b4fc;
+        }
+
+        /* Custom Institutional Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.2);
+            border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.1);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "react-markdown": "https://esm.sh/react-markdown@^9.0.1",
+    "lucide-react": "https://esm.sh/lucide-react@0.471.0?external=react"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-slate-50 text-slate-900 overflow-hidden">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

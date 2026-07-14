@@ -1,0 +1,8 @@
+{
+  "name": "LegalAI Pro",
+  "description": "Elite multi-jurisdictional legal reference with precision-filtered intelligence.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
